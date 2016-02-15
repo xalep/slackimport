@@ -1,6 +1,9 @@
 package com.siruplab.slack.slackimport
 
 import com.fasterxml.jackson.databind.JsonNode
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 data class ChannelId(val id: String)
 data class UserId(val id: String)
@@ -59,8 +62,22 @@ class Message(raw: JsonNode, val channel: Channel) : DataNode(raw) {
   val text = string("text")
   val user: UserId? = if (string("user") == null) null else UserId(string("user")!!)
   val subType = string("subtype")
+  val timeStamp = Timestamp(string("ts")!!)
   override fun toString(): String {
-    return "Message(channel=${channel.name}, text=$text, user=$user, subType=$subType)"
+    return "Message(channel=${channel.name}, text=$text, user=$user, subType=$subType, timeStamp=$timeStamp)"
   }
 }
 
+class Timestamp(val ts: String) : Comparable<Timestamp> {
+
+  val instant = Instant.ofEpochMilli((1000 * ts.toDouble()).toLong())
+  val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+
+  override fun compareTo(other: Timestamp): Int {
+    return instant.compareTo(other.instant)
+  }
+
+  override fun toString(): String {
+    return instant.toString()
+  }
+}
