@@ -17,7 +17,7 @@ open class DataNode(val raw: JsonNode) {
 
 class Channel(raw: JsonNode) : DataNode(raw) {
   val id = ChannelId(string("id")!!)
-  val name = string("name")
+  val name = string("name")!!
   val creator = UserId(string("creator")!!)
   override fun toString(): String {
     return "Channel(id=$id, name=$name, creator=$creator)"
