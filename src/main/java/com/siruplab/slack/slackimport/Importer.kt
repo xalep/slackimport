@@ -28,20 +28,28 @@ fun main(args: Array<String>) {
   System.out.println("*** Most prolific users ***")
   messages
       .filter { it.user != null }
-      .groupBy { it.user }
-      .map { Pair(users.userName(it.key!!), it.value.size) }
-      .sortedByDescending { it.second }
-      .take(5)
+      .countBy(5) { users.userName(it.user!!) }
       .forEach { System.out.println(it) }
 
   System.out.println("*** Most active channels ***")
   messages
-      .groupBy { it.channel }
-      .map { Pair(it.key.name, it.value.size) }
-      .sortedByDescending { it.second }
-      .take(5)
+      .countBy(5) { it.channel.name }
       .forEach { System.out.println(it) }
+
+
+  System.out.println("*** subtypes ***")
+  messages
+      .filter { it.subType != null }
+      .countBy { it.subType }
+      .forEach { System.out.println(it) }
+
 }
 
+fun <T, K> Iterable<T>.countBy(top: Int = Int.MAX_VALUE, keySelector: (T) -> K): List<Pair<K, Int>> {
+  return groupBy { keySelector.invoke(it) }
+      .map { Pair(it.key, it.value.size) }
+      .sortedByDescending { it.second }
+      .take(top)
+}
 
 
